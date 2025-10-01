@@ -81,12 +81,10 @@ class JobSequencer {
     _tryExecuteJobs();
   }
 
-  /// Use [addJob] if possible.
-  ///
   /// Creates a job with the given index.
   ///
   /// If no index is given, one is deduced:
-  /// - If there are no pending jobs, the index will be 0.
+  /// - If there are no pending jobs, the index will be [initialIndex].
   /// - Otherwise, pick the last pending index + 1.
   void createAndAdd(Future<void> Function() fn, [int? index]) {
     index ??= getNextIndex();
