@@ -54,6 +54,7 @@ class JobSequencer {
   /// Already running jobs will still execute normally.
   void reset() {
     _currentIndex = initialIndex;
+    _runningIndexes.clear();
     _pendingJobs.clear();
   }
 
