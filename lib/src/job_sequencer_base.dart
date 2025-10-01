@@ -27,6 +27,9 @@ class JobSequencer {
 
   final Set<int> _runningIndexes = {};
 
+  /// Generation counter to invalidate running jobs after reset.
+  int _generation = 0;
+
   /// A map to hold jobs that are waiting to be executed.
   final Map<int, Job> _pendingJobs = {};
 
@@ -51,11 +54,13 @@ class JobSequencer {
 
   /// Clears the pending jobs.
   ///
-  /// Already running jobs will still execute normally.
+  /// Already running jobs will still execute normally, but won't affect
+  /// the sequence state after completion.
   void reset() {
     _currentIndex = initialIndex;
     _runningIndexes.clear();
     _pendingJobs.clear();
+    _generation++;
   }
 
   /// Waits for all jobs to finish and resets the state.
@@ -111,6 +116,8 @@ class JobSequencer {
     }
 
     _runningIndexes.add(index);
+    final jobGeneration = _generation;
+
     // Execute the job function.
     try {
       await job.fn();
@@ -121,10 +128,13 @@ class JobSequencer {
       _runningIndexes.remove(index);
     }
 
-    // Increment the current index after the job is executed.
-    _currentIndex++;
+    // Only increment and continue if this job hasn't been invalidated by reset
+    if (jobGeneration == _generation) {
+      // Increment the current index after the job is executed.
+      _currentIndex++;
 
-    // Try executing the next job in the sequence.
-    _tryExecuteJobs();
+      // Try executing the next job in the sequence.
+      _tryExecuteJobs();
+    }
   }
 }

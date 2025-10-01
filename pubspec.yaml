@@ -1,13 +1,12 @@
 name: job_sequencer
 description: Manages sequential job execution, ensuring jobs run in order, crucial for ordered task processing.
-version: 1.1.0
+version: 1.1.1
 repository: https://github.com/TimeLord2010/job_sequencer
 
 environment:
   sdk: ^3.7.0
 
 dependencies:
-  # path: ^1.8.0
 
 dev_dependencies:
   lints: ^5.0.0
