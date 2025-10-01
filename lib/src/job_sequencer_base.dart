@@ -34,6 +34,21 @@ class JobSequencer {
     return _pendingJobs.isNotEmpty || _runningIndexes.isNotEmpty;
   }
 
+  /// Returns the next index that will be used for job execution.
+  ///
+  /// This is useful for understanding what the next job index will be
+  /// without actually adding a job.
+  int getNextIndex() {
+    if (_pendingJobs.isEmpty && _runningIndexes.isEmpty) {
+      return initialIndex;
+    }
+    var last =
+        _pendingJobs.keys.lastOrNull ??
+        _runningIndexes.lastOrNull ??
+        (initialIndex - 1);
+    return last + 1;
+  }
+
   /// Clears the pending jobs.
   ///
   /// Already running jobs will still execute normally.
@@ -74,17 +89,7 @@ class JobSequencer {
   /// - If there are no pending jobs, the index will be 0.
   /// - Otherwise, pick the last pending index + 1.
   void createAndAdd(Future<void> Function() fn, [int? index]) {
-    if (index == null) {
-      if (_pendingJobs.isEmpty && _runningIndexes.isEmpty) {
-        index = initialIndex;
-      } else {
-        var last =
-            _pendingJobs.keys.lastOrNull ??
-            _runningIndexes.lastOrNull ??
-            (initialIndex - 1);
-        index = last + 1;
-      }
-    }
+    index ??= getNextIndex();
     var job = Job(fn: fn, index: index);
     addJob(job);
   }
