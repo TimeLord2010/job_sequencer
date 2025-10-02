@@ -87,15 +87,25 @@ class JobSequencer {
     _tryExecuteJobs();
   }
 
-  /// Creates a job with the given index.
+  /// Creates a job with the given index and adds it to the sequencer.
   ///
-  /// If no index is given, one is deduced:
+  /// If no index is given, one is automatically calculated:
   /// - If there are no pending jobs, the index will be [initialIndex].
   /// - Otherwise, pick the last pending index + 1.
-  void createAndAdd(Future<void> Function() fn, [int? index]) {
+  ///
+  /// **Warning:** When calling this method rapidly in parallel without providing
+  /// an explicit index, there is a race condition where multiple calls may
+  /// calculate the same index simultaneously. This can cause jobs to be skipped
+  /// or exceptions to be thrown due to duplicate indices.
+  ///
+  /// To avoid this issue in concurrent scenarios:
+  /// - Provide an explicit index parameter, or
+  /// - Use the [addJob] method with pre-created [Job] instances
+  Job createAndAdd(Future<void> Function() fn, [int? index]) {
     index ??= getNextIndex();
     var job = Job(fn: fn, index: index);
     addJob(job);
+    return job;
   }
 
   /// Attempts to execute jobs in order starting from the current index.
