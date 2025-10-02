@@ -4,3 +4,4 @@
 library;
 
 export 'src/job_sequencer_base.dart';
+export 'src/job_sequencer_timer.dart';

@@ -134,7 +134,7 @@ class JobSequencer {
       _currentIndex++;
 
       // Try executing the next job in the sequence.
-      _tryExecuteJobs();
+      await _tryExecuteJobs();
     }
   }
 }
